@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Sketch Prototypes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar for the phone screen */
+        .phone-screen::-webkit-scrollbar {
+            width: 4px;
+        }
+        .phone-screen::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        /* Smooth transitions */
+        .fade-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+    </style>
+</head>
+<body class="bg-slate-800 h-screen w-full flex flex-col items-center justify-center font-sans text-slate-800 overflow-hidden">
+
+    <!-- PROTOTYPE CONTAINER -->
+    <div class="relative w-[375px] h-[750px] bg-white rounded-[3rem] shadow-2xl border-[8px] border-slate-900 overflow-hidden flex flex-col">
+        
+        <!-- PHONE NOTCH / STATUS BAR -->
+        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-xl z-50"></div>
+        <div class="w-full h-8 bg-white shrink-0"></div> <!-- Spacer for status bar -->
+
+        <!-- DYNAMIC SCREEN CONTENT AREA -->
+        <main id="app-content" class="flex-1 relative overflow-hidden bg-gray-50">
+            <!-- Screens will be injected here via JS -->
+        </main>
+
+        <!-- PHONE HOME INDICATOR -->
+        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-slate-300 rounded-full z-50"></div>
+    </div>
+
+    <!-- NAVIGATION CONTROLS (OUTSIDE PHONE) -->
+    <div class="mt-8 p-4 bg-slate-900 rounded-xl shadow-lg max-w-2xl w-full">
+        <h3 class="text-slate-400 text-xs uppercase tracking-wider mb-3 font-bold text-center">Select UI Pattern (From Sketch)</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <button onclick="loadScreen('list')" class="px-3 py-2 bg-slate-700 hover:bg-blue-600 text-white text-xs rounded transition">List</button>
+            <button onclick="loadScreen('tabs')" class="px-3 py-2 bg-slate-700 hover:bg-blue-600 text-white text-xs rounded transition">Tabs</button>
+            <button onclick="loadScreen('popover')" class="px-3 py-2 bg-slate-700 hover:bg-blue-600 text-white text-xs rounded transition">Popover</button>
+            <button onclick="loadScreen('sliding')" class="px-3 py-2 bg-slate-700 hover:bg-blue-600 text-white text-xs rounded transition">Sliding</button>
+            <button onclick="loadScreen('dashboard')" class="px-3 py-2 bg-slate-700 hover:bg-blue-600 text-white text-xs rounded transition">Dashboard</button>
+            <button onclick="loadScreen('customTabs')" class="px-3 py-2 bg-slate-700 hover:bg-blue-600 text-white text-xs rounded transition">Top Tabs</button>
+        </div>
+    </div>
+
+    <!-- TEMPLATES FOR SCREENS -->
+    
+    <!-- 1. LIST VIEW -->
+    <template id="tpl-list">
+        <div class="flex flex-col h-full animate-fade">
+            <header class="bg-gray-300 p-4 pt-2 border-b border-gray-400 shadow-sm z-10">
+                <h1 class="text-center font-bold text-lg tracking-widest text-gray-800">HEADER</h1>
+            </header>
+            <div class="flex-1 overflow-y-auto bg-white">
+                <ul class="divide-y divide-gray-200">
+                    <li onclick="updateContent('News')" class="p-5 hover:bg-gray-100 cursor-pointer flex justify-between items-center group">
+                        <span class="font-medium text-lg">News</span>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500"></i>
+                    </li>
+                    <li onclick="updateContent('My Stuff')" class="p-5 hover:bg-gray-100 cursor-pointer flex justify-between items-center group">
+                        <span class="font-medium text-lg">My Stuff</span>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500"></i>
+                    </li>
+                    <li onclick="updateContent('Downloads')" class="p-5 hover:bg-gray-100 cursor-pointer flex justify-between items-center group">
+                        <span class="font-medium text-lg">Downloads</span>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500"></i>
+                    </li>
+                    <li onclick="updateContent('Sync')" class="p-5 hover:bg-gray-100 cursor-pointer flex justify-between items-center group">
+                        <span class="font-medium text-lg">Sync</span>
+                        <i class="fas fa-chevron-right text-gray-300 group-hover:text-gray-500"></i>
+                    </li>
+                </ul>
+                <div id="list-content-display" class="p-8 text-center text-gray-300 mt-10">
+                    <p class="text-4xl font-handwriting opacity-50 rotate-[-10deg]">Select an item</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 2. TABS VIEW -->
+    <template id="tpl-tabs">
+        <div class="flex flex-col h-full relative animate-fade">
+            <header class="bg-gray-300 p-4 pt-2 border-b border-gray-400 shadow-sm">
+                <h1 class="text-center font-bold text-lg tracking-widest text-gray-800">HEADER</h1>
+            </header>
+            
+            <!-- Main Content -->
+            <div class="flex-1 flex items-center justify-center bg-gray-50">
+                <h2 id="tab-display-text" class="text-6xl font-bold text-gray-300 transform -rotate-12 font-handwriting">NEWS</h2>
+            </div>
+
+            <!-- Bottom Tabs -->
+            <nav class="bg-gray-300 border-t border-gray-400 h-16 flex justify-around items-center px-2">
+                <button onclick="setActiveTab(this, 'NEWS')" class="flex flex-col items-center justify-center w-full h-full text-gray-800 hover:bg-gray-400/20 active-tab">
+                    <div class="border-2 border-gray-700 w-8 h-8 flex items-center justify-center rounded mb-1 bg-white">
+                        <span class="font-bold text-lg">N</span>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase">News</span>
+                </button>
+                <button onclick="setActiveTab(this, 'STUFF')" class="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:bg-gray-400/20">
+                    <div class="border-2 border-gray-600 w-8 h-8 flex items-center justify-center rounded mb-1">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase">Stuff</span>
+                </button>
+                <button onclick="setActiveTab(this, 'DOWNL')" class="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:bg-gray-400/20">
+                    <div class="border-2 border-gray-600 w-8 h-8 flex items-center justify-center rounded mb-1">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase">Downl</span>
+                </button>
+                <button onclick="setActiveTab(this, 'SYNC')" class="flex flex-col items-center justify-center w-full h-full text-gray-600 hover:bg-gray-400/20">
+                    <div class="border-2 border-gray-600 w-8 h-8 flex items-center justify-center rounded mb-1">
+                        <i class="fas fa-sync"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase">Sync</span>
+                </button>
+            </nav>
+        </div>
+    </template>
+
+    <!-- 3. POPOVER VIEW -->
+    <template id="tpl-popover">
+        <div class="flex flex-col h-full relative animate-fade">
+            <header class="bg-gray-300 p-4 pt-2 border-b border-gray-400 shadow-sm flex items-center justify-between relative z-20">
+                <button onclick="togglePopover()" class="w-8 h-8 border-2 border-gray-700 grid grid-cols-2 gap-0.5 p-1 bg-white hover:bg-gray-100">
+                    <div class="bg-gray-800 rounded-sm"></div>
+                    <div class="bg-gray-800 rounded-sm"></div>
+                    <div class="bg-gray-800 rounded-sm"></div>
+                    <div class="bg-gray-800 rounded-sm"></div>
+                </button>
+                <h1 class="absolute left-0 right-0 text-center font-bold text-lg tracking-widest text-gray-800 pointer-events-none">HEADER</h1>
+                <div class="w-8"></div> <!-- Spacer -->
+            </header>
+
+            <!-- Popover Menu -->
+            <div id="popover-menu" class="absolute top-16 left-4 z-30 hidden transition-all duration-200 origin-top-left">
+                <!-- Speech bubble arrow -->
+                <div class="w-4 h-4 bg-white border-l border-t border-gray-800 transform rotate-45 absolute -top-2 left-3"></div>
+                
+                <!-- Menu Content -->
+                <div class="bg-white border-2 border-gray-800 rounded-lg shadow-xl p-4 w-48">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="setPopoverContent('NEWS')" class="flex flex-col items-center p-2 hover:bg-gray-100 rounded">
+                            <div class="w-10 h-10 border-2 border-gray-800 flex items-center justify-center text-xl font-bold mb-1">N</div>
+                            <span class="text-xs font-bold">NEWS</span>
+                        </button>
+                        <button onclick="setPopoverContent('STUFF')" class="flex flex-col items-center p-2 hover:bg-gray-100 rounded">
+                            <div class="w-10 h-10 border-2 border-gray-800 flex items-center justify-center text-xl font-bold mb-1"><i class="fas fa-file-alt"></i></div>
+                            <span class="text-xs font-bold">STUFF</span>
+                        </button>
+                        <button onclick="setPopoverContent('SYNC')" class="flex flex-col items-center p-2 hover:bg-gray-100 rounded">
+                            <div class="w-10 h-10 border-2 border-gray-800 flex items-center justify-center text-xl font-bold mb-1"><i class="fas fa-arrow-down"></i></div>
+                            <span class="text-xs font-bold">SYNC</span>
+                        </button>
+                        <button onclick="setPopoverContent('REFRESH')" class="flex flex-col items-center p-2 hover:bg-gray-100 rounded">
+                            <div class="w-10 h-10 border-2 border-gray-800 flex items-center justify-center text-xl font-bold mb-1"><i class="fas fa-sync"></i></div>
+                            <span class="text-xs font-bold">REF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div onclick="closePopover()" class="flex-1 flex items-center justify-center bg-gray-50 cursor-default">
+                <h2 id="popover-display-text" class="text-6xl font-bold text-gray-300 transform -rotate-12 font-handwriting">NEWS</h2>
+            </div>
+        </div>
+    </template>
+
+    <!-- 4. SLIDING MENU VIEW -->
+    <template id="tpl-sliding">
+        <div class="flex flex-col h-full relative overflow-hidden animate-fade">
+            <!-- Header -->
+            <header class="bg-gray-300 p-4 pt-2 border-b border-gray-400 shadow-sm flex items-center justify-between z-20 relative">
+                <button onclick="toggleDrawer()" class="text-gray-800 text-2xl hover:text-gray-600">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="absolute left-0 right-0 text-center font-bold text-lg tracking-widest text-gray-800 pointer-events-none">HEADER</h1>
+                <div class="w-8"></div>
+            </header>
+
+            <!-- Main Content Layer -->
+            <div id="sliding-main" class="flex-1 flex items-center justify-center bg-gray-50 transition-transform duration-300 ease-out z-10 relative">
+                <h2 id="sliding-display-text" class="text-6xl font-bold text-gray-300 transform -rotate-12 font-handwriting">NEWS</h2>
+                
+                <!-- Overlay for closing -->
+                <div id="drawer-overlay" onclick="toggleDrawer()" class="absolute inset-0 bg-black/20 hidden opacity-0 transition-opacity duration-300"></div>
+            </div>
+
+            <!-- Drawer Layer (Behind or Slide-in) -->
+            <!-- Note: Sketch implies menu pushes content or slides over. I'll implement slide-over for smoother feel -->
+            <div id="sliding-drawer" class="absolute top-[50px] bottom-0 left-0 w-64 bg-gray-200 border-r border-gray-400 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out z-30">
+                <div class="p-4 bg-gray-300 font-bold text-gray-600 text-xs uppercase tracking-wider">Menu</div>
+                <ul class="divide-y divide-gray-300">
+                    <li onclick="setSlidingContent('NEWS')" class="p-4 hover:bg-white cursor-pointer font-bold text-gray-700 border-l-4 border-transparent hover:border-blue-500">NEWS</li>
+                    <li onclick="setSlidingContent('MY STUFF')" class="p-4 hover:bg-white cursor-pointer font-bold text-gray-700 border-l-4 border-transparent hover:border-blue-500">MY STUFF</li>
+                    <li onclick="setSlidingContent('DOWNLOADS')" class="p-4 hover:bg-white cursor-pointer font-bold text-gray-700 border-l-4 border-transparent hover:border-blue-500">DOWNLOADS</li>
+                    <li onclick="setSlidingContent('SYNC')" class="p-4 hover:bg-white cursor-pointer font-bold text-gray-700 border-l-4 border-transparent hover:border-blue-500">SYNC</li>
+                </ul>
+                <!-- Arrow annotation from sketch -->
+                <div class="absolute bottom-20 right-4 text-gray-400 text-4xl">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 5. DASHBOARD VIEW -->
+    <template id="tpl-dashboard">
+        <div class="flex flex-col h-full animate-fade">
+            <header class="bg-gray-300 p-4 pt-2 border-b border-gray-400 shadow-sm">
+                <h1 class="text-center font-bold text-lg tracking-widest text-gray-800">HEADER</h1>
+            </header>
+            
+            <div class="flex-1 bg-gray-50 p-6 flex items-center">
+                <div class="grid grid-cols-2 gap-8 w-full">
+                    <!-- Item 1 -->
+                    <button onclick="alert('Navigating to News...')" class="aspect-square flex flex-col items-center justify-center border-2 border-gray-800 rounded-lg hover:bg-gray-100 transition shadow-sm group">
+                        <span class="text-5xl font-bold text-gray-800 mb-2 group-hover:scale-110 transition-transform">N</span>
+                        <span class="font-bold text-sm uppercase tracking-wide">News</span>
+                    </button>
+                    
+                    <!-- Item 2 -->
+                    <button onclick="alert('Navigating to Stuff...')" class="aspect-square flex flex-col items-center justify-center border-2 border-gray-800 rounded-lg hover:bg-gray-100 transition shadow-sm group">
+                        <i class="fas fa-file-alt text-4xl text-gray-800 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-sm uppercase tracking-wide">Stuff</span>
+                    </button>
+
+                    <!-- Item 3 -->
+                    <button onclick="alert('Navigating to Downloads...')" class="aspect-square flex flex-col items-center justify-center border-2 border-gray-800 rounded-lg hover:bg-gray-100 transition shadow-sm group">
+                        <i class="fas fa-arrow-down text-4xl text-gray-800 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-sm uppercase tracking-wide">Downl</span>
+                    </button>
+
+                    <!-- Item 4 -->
+                    <button onclick="alert('Syncing...')" class="aspect-square flex flex-col items-center justify-center border-2 border-gray-800 rounded-lg hover:bg-gray-100 transition shadow-sm group">
+                        <i class="fas fa-sync text-4xl text-gray-800 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-bold text-sm uppercase tracking-wide">Sync</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 6. CUSTOM TABS VIEW -->
+    <template id="tpl-customTabs">
+        <div class="flex flex-col h-full animate-fade">
+            <header class="bg-gray-300 pt-2 shadow-sm flex flex-col">
+                <h1 class="text-center font-bold text-lg tracking-widest text-gray-800 mb-2">HEADER</h1>
+                
+                <!-- Top Tabs Bar -->
+                <div class="flex border-t border-gray-400 bg-gray-400/20">
+                    <button onclick="setTopTab(this, 'NEWS')" class="flex-1 py-2 border-r border-gray-400 flex flex-col items-center hover:bg-white/50 bg-white/50 top-tab-active">
+                        <span class="font-bold text-lg leading-none">N</span>
+                        <span class="text-[9px] font-bold uppercase">News</span>
+                    </button>
+                    <button onclick="setTopTab(this, 'STUFF')" class="flex-1 py-2 border-r border-gray-400 flex flex-col items-center hover:bg-white/50 text-gray-600">
+                        <i class="fas fa-file-alt text-lg leading-none"></i>
+                        <span class="text-[9px] font-bold uppercase">Stuff</span>
+                    </button>
+                    <button onclick="setTopTab(this, 'DOWNL')" class="flex-1 py-2 border-r border-gray-400 flex flex-col items-center hover:bg-white/50 text-gray-600">
+                        <i class="fas fa-arrow-down text-lg leading-none"></i>
+                        <span class="text-[9px] font-bold uppercase">Downl</span>
+                    </button>
+                    <button onclick="setTopTab(this, 'SYNC')" class="flex-1 py-2 flex flex-col items-center hover:bg-white/50 text-gray-600">
+                        <i class="fas fa-sync text-lg leading-none"></i>
+                        <span class="text-[9px] font-bold uppercase">Sync</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Main Content -->
+            <div class="flex-1 flex items-center justify-center bg-gray-50">
+                <h2 id="top-tab-display" class="text-6xl font-bold text-gray-300 transform -rotate-12 font-handwriting">NEWS</h2>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // --- CORE NAVIGATION LOGIC ---
+        const appContent = document.getElementById('app-content');
+
+        function loadScreen(screenName) {
+            const template = document.getElementById(`tpl-${screenName}`);
+            if (!template) return;
+
+            // Clear current content
+            appContent.innerHTML = '';
+            
+            // Clone and append new content
+            const clone = template.content.cloneNode(true);
+            appContent.appendChild(clone);
+        }
+
+        // Initialize with the first screen (List)
+        loadScreen('list');
+
+
+        // --- SCREEN SPECIFIC LOGIC ---
+
+        // 1. List Logic
+        function updateContent(text) {
+            const display = document.getElementById('list-content-display');
+            if(display) {
+                display.innerHTML = `<h2 class="text-4xl font-bold text-gray-800">${text}</h2><p class="text-gray-500 mt-2">Detail view loaded.</p>`;
+            }
+        }
+
+        // 2. Tabs Logic
+        function setActiveTab(btn, text) {
+            // Reset styles
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('text-gray-800', 'active-tab');
+                b.classList.add('text-gray-600');
+                b.querySelector('div').classList.remove('bg-white');
+            });
+
+            // Set active style
+            btn.classList.remove('text-gray-600');
+            btn.classList.add('text-gray-800', 'active-tab');
+            btn.querySelector('div').classList.add('bg-white');
+
+            // Update content
+            document.getElementById('tab-display-text').innerText = text;
+        }
+
+        // 3. Popover Logic
+        function togglePopover() {
+            const menu = document.getElementById('popover-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function closePopover() {
+            document.getElementById('popover-menu').classList.add('hidden');
+        }
+
+        function setPopoverContent(text) {
+            document.getElementById('popover-display-text').innerText = text;
+            closePopover();
+        }
+
+        // 4. Sliding Menu Logic
+        function toggleDrawer() {
+            const drawer = document.getElementById('sliding-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            
+            if (drawer.classList.contains('-translate-x-full')) {
+                // Open
+                drawer.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10); // fade in
+            } else {
+                // Close
+                drawer.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300); // wait for fade out
+            }
+        }
+
+        function setSlidingContent(text) {
+            document.getElementById('sliding-display-text').innerText = text;
+            toggleDrawer();
+        }
+
+        // 6. Top Tabs Logic
+        function setTopTab(btn, text) {
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('bg-white/50', 'text-gray-800');
+                b.classList.add('text-gray-600');
+            });
+            
+            btn.classList.remove('text-gray-600');
+            btn.classList.add('bg-white/50', 'text-gray-800');
+            
+            document.getElementById('top-tab-display').innerText = text;
+        }
+
+    </script>
+</body>
+</html>
